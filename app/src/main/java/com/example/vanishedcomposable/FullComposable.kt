@@ -13,6 +13,7 @@ import android.graphics.Bitmap
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.delay
@@ -46,10 +47,9 @@ fun ComposableToDots(
         }
     )
 
-    // Handle bitmap capture after view is ready
     LaunchedEffect(composeView) {
         composeView?.let { view ->
-            delay(100) // Give time for the view to be properly laid out
+            delay(100)
             if (bitmap == null) {
                 try {
                     val capturedBitmap = view.drawToBitmap(Bitmap.Config.ARGB_8888)
@@ -83,6 +83,7 @@ fun ComposableToDots(
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable { isAnimating = true }
+                    .alpha(1f - animationProgress.value)
             ) {
                 isAnimating = true
                 Canvas(modifier = Modifier.fillMaxSize()) {
