@@ -23,6 +23,7 @@ fun ComposableToDots(
     modifier: Modifier = Modifier,
     dotSize: Float = 8f,
     spacing: Float = 2f,
+    vanished: MutableState<Boolean>,
     content: @Composable () -> Unit
 ) {
     var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
@@ -37,10 +38,12 @@ fun ComposableToDots(
     val animationProgress = animateFloatAsState(
         targetValue = if (isAnimating) 1f else 0f,
         animationSpec = tween(
-            durationMillis = 2000,
+            durationMillis = 1000,
             easing = LinearEasing
         ),
-        finishedListener = { isAnimating = false }
+        finishedListener = {
+           // isAnimating = false
+        }
     )
 
     // Handle bitmap capture after view is ready
@@ -59,7 +62,7 @@ fun ComposableToDots(
     }
 
     Box(modifier = modifier) {
-        if (bitmap == null) {
+        if (bitmap == null || vanished.value == false) {
             AndroidView(
                 factory = { context ->
                     ComposeView(context).apply {
@@ -81,6 +84,7 @@ fun ComposableToDots(
                     .fillMaxSize()
                     .clickable { isAnimating = true }
             ) {
+                isAnimating = true
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val dotSizePx = dotSize * density
                     val spacingPx = spacing * density
