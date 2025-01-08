@@ -1,6 +1,6 @@
 package com.example.vanishedcomposable
 
-import ComposableToDots
+import ComposableAnimation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }*/
                     Column(Modifier.padding(innerPadding)) {
-                        ComposableToDots(
+                        ComposableAnimation(
                             Modifier
                                 .height(200.dp)
                                 .fillMaxWidth(),
@@ -66,30 +66,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             ContentComposable(vanished)
                         }
-                        ComposableToDots(
-                            Modifier
-                                .height(200.dp)
-                                .fillMaxWidth(),
-                            vanished = vanished
-                        ) {
-                            ContentComposable(vanished)
-                        }
-                        ComposableToDots(
-                            Modifier
-                                .height(200.dp)
-                                .fillMaxWidth(),
-                            vanished = vanished
-                        ) {
-                            ContentComposable(vanished)
-                        }
-                        ComposableToDots(
-                            Modifier
-                                .height(200.dp)
-                                .fillMaxWidth(),
-                            vanished = vanished
-                        ) {
-                            ContentComposable(vanished)
-                        }
+
                     }
                 }
             }
