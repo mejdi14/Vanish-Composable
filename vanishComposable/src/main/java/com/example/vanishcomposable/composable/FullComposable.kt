@@ -33,7 +33,7 @@ fun ComposableAnimation(
     modifier: Modifier = Modifier,
     dotSize: Float = 6f,
     spacing: Float = 2f,
-    effect: AnimationEffect = AnimationEffect.SCATTER,
+    effect: AnimationEffect = AnimationEffect.LEFT,
     onControllerReady: (AnimationController) -> Unit = {},
     content: @Composable () -> Unit
 ) {

@@ -16,7 +16,7 @@ internal fun DrawScope.directional(
 ) {
     val dotProgress = (animationProgress.value * randomValue)
         .coerceIn(0f, 1f)
-    val alpha = 1f - dotProgress
+    val alpha = 1f - animationProgress.value
 
     val offset = when (effect) {
         AnimationEffect.LEFT -> Offset(size.width * dotProgress, 0f)
