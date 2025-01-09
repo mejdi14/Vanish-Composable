@@ -43,7 +43,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VanishedComposableTheme {
-                val controllers = remember { mutableStateListOf<AnimationController>() }
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()

@@ -9,27 +9,24 @@ import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import android.graphics.Bitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.drawToBitmap
+import com.example.vanishcomposable.Animation.AnimationEffect
+import com.example.vanishcomposable.Animation.directional
+import com.example.vanishcomposable.Animation.dissolve
+import com.example.vanishcomposable.Animation.explode
+import com.example.vanishcomposable.Animation.pixelate
+import com.example.vanishcomposable.Animation.scatter
+import com.example.vanishcomposable.Animation.shatter
+import com.example.vanishcomposable.Animation.swirl
+import com.example.vanishcomposable.Animation.wave
 import com.example.vanishcomposable.controller.AnimationController
 import com.example.vanishcomposable.controller.AnimationStateHolder
 import kotlinx.coroutines.delay
 import kotlin.math.*
 import kotlin.random.Random
 
-enum class AnimationEffect {
-    PIXELATE,
-    SWIRL,
-    SCATTER,
-    SHATTER,
-    WAVE,
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN,
-    DISSOLVE,
-    EXPLODE
-}
 
 @Composable
 fun ComposableAnimation(
@@ -152,197 +149,98 @@ fun ComposableAnimation(
 
                             when (effect) {
                                 AnimationEffect.DISSOLVE -> {
-                                    val dissolveProgress =
-                                        (animationProgress.value + randomValue * 0.3f)
-                                            .coerceIn(0f, 1f)
-                                    val alpha = 1f - dissolveProgress
-
-                                    if (alpha > 0 && randomValue > dissolveProgress) {
-                                        val shake = (randomValue - 0.5f) * 10 * dissolveProgress
-                                        drawCircle(
-                                            color = Color(pixel).copy(alpha = alpha),
-                                            radius = dotSizePx / 2 * (1f - dissolveProgress * 0.3f),
-                                            center = Offset(
-                                                baseX + dotSizePx / 2 + shake,
-                                                baseY + dotSizePx / 2 + shake
-                                            )
-                                        )
-                                    }
+                                    dissolve(
+                                        animationProgress,
+                                        randomValue,
+                                        pixel,
+                                        dotSizePx,
+                                        baseX,
+                                        baseY
+                                    )
                                 }
 
                                 AnimationEffect.EXPLODE -> {
-                                    val centerX = size.width / 2
-                                    val centerY = size.height / 2
-                                    val dx = baseX - centerX
-                                    val dy = baseY - centerY
-                                    val angle = atan2(dy, dx)
-                                    val distance = sqrt(dx * dx + dy * dy)
-
-                                    val progress = animationProgress.value
-                                    val speed = 1f + randomValue * 0.5f
-                                    val newDistance = distance + (size.width * progress * speed)
-                                    val alpha = (1f - progress) * (1f - distance / size.width)
-
-                                    if (alpha > 0) {
-                                        drawCircle(
-                                            color = Color(pixel).copy(alpha = alpha),
-                                            radius = dotSizePx / 2 * (1f - progress * 0.5f),
-                                            center = Offset(
-                                                centerX + cos(angle) * newDistance,
-                                                centerY + sin(angle) * newDistance
-                                            )
-                                        )
-                                    }
+                                    explode(
+                                        baseX,
+                                        baseY,
+                                        animationProgress,
+                                        randomValue,
+                                        pixel,
+                                        dotSizePx
+                                    )
                                 }
 
 
                                 AnimationEffect.SHATTER -> {
-                                    val dx = baseX - centerX
-                                    val dy = baseY - centerY
-                                    val distance = sqrt(dx * dx + dy * dy)
-                                    val maxDistance =
-                                        sqrt(size.width * size.width + size.height * size.height)
-                                    val angle = atan2(dy, dx)
-
-                                    val progress =
-                                        (animationProgress.value + distance / maxDistance * 0.3f)
-                                            .coerceIn(0f, 1f)
-                                    val scale = 1 - progress * 0.5f
-                                    val alpha = (1 - progress).coerceIn(0f, 1f)
-
-                                    if (alpha > 0) {
-                                        val speed = 1 + randomValue * 0.5f
-                                        val newDistance =
-                                            distance + (maxDistance * progress * speed)
-                                        drawCircle(
-                                            color = Color(pixel).copy(alpha = alpha),
-                                            radius = dotSizePx / 2 * scale,
-                                            center = Offset(
-                                                centerX + cos(angle) * newDistance,
-                                                centerY + sin(angle) * newDistance
-                                            )
-                                        )
-                                    }
+                                    shatter(
+                                        baseX,
+                                        centerX,
+                                        baseY,
+                                        centerY,
+                                        animationProgress,
+                                        randomValue,
+                                        pixel,
+                                        dotSizePx
+                                    )
                                 }
 
                                 AnimationEffect.SCATTER -> {
-                                    val progress = animationProgress.value
-                                    val angle = randomValue * 2 * PI.toFloat()
-                                    val distance = progress * size.width * randomValue
-                                    val scale = 1 - progress * 0.5f
-                                    val alpha = (1 - progress).coerceIn(0f, 1f)
-
-                                    if (alpha > 0) {
-                                        drawCircle(
-                                            color = Color(pixel).copy(alpha = alpha),
-                                            radius = dotSizePx / 2 * scale,
-                                            center = Offset(
-                                                baseX + cos(angle) * distance,
-                                                baseY + sin(angle) * distance
-                                            )
-                                        )
-                                    }
+                                    scatter(
+                                        animationProgress,
+                                        randomValue,
+                                        pixel,
+                                        dotSizePx,
+                                        baseX,
+                                        baseY
+                                    )
                                 }
 
                                 AnimationEffect.WAVE -> {
-                                    val progress = animationProgress.value
-                                    val waveHeight = size.height * 0.1f
-                                    val frequency = 0.05f
-                                    val speed = 10f
-
-                                    val offsetX = sin(
-                                        (baseY * frequency + progress * speed) +
-                                                randomValue * 0.2f
-                                    ) * waveHeight * progress
-
-                                    val alpha =
-                                        if (progress < 0.7f) 1f else (1 - (progress - 0.7f) / 0.3f)
-
-                                    if (alpha > 0) {
-                                        drawCircle(
-                                            color = Color(pixel).copy(alpha = alpha),
-                                            radius = dotSizePx / 2,
-                                            center = Offset(
-                                                baseX + offsetX,
-                                                baseY
-                                            )
-                                        )
-                                    }
+                                    wave(
+                                        animationProgress,
+                                        baseY,
+                                        randomValue,
+                                        pixel,
+                                        dotSizePx,
+                                        baseX
+                                    )
                                 }
 
                                 AnimationEffect.PIXELATE -> {
-                                    val progress = animationProgress.value
-                                    val gridSize = (progress * 20).toInt() + 1
-                                    val cellX = (col / gridSize) * gridSize
-                                    val cellY = (row / gridSize) * gridSize
-
-                                    if (col % gridSize == 0 && row % gridSize == 0) {
-                                        val alpha = (1 - progress).coerceIn(0f, 1f)
-                                        val scale = gridSize.toFloat()
-
-                                        drawCircle(
-                                            color = Color(pixel).copy(alpha = alpha),
-                                            radius = dotSizePx / 2 * scale,
-                                            center = Offset(
-                                                baseX + (dotSizePx + spacingPx) * gridSize / 2,
-                                                baseY + (dotSizePx + spacingPx) * gridSize / 2
-                                            )
-                                        )
-                                    }
+                                    pixelate(
+                                        animationProgress,
+                                        col,
+                                        row,
+                                        pixel,
+                                        dotSizePx,
+                                        baseX,
+                                        spacingPx,
+                                        baseY
+                                    )
                                 }
 
                                 AnimationEffect.SWIRL -> {
-                                    val progress = animationProgress.value
-                                    val dx = baseX - centerX
-                                    val dy = baseY - centerY
-                                    val distance = sqrt(dx * dx + dy * dy)
-                                    val angle = atan2(dy, dx) +
-                                            (1 - distance / size.width) * progress * 4 * PI.toFloat()
-
-                                    val alpha = (1 - progress).coerceIn(0f, 1f)
-                                    if (alpha > 0) {
-                                        drawCircle(
-                                            color = Color(pixel).copy(alpha = alpha),
-                                            radius = dotSizePx / 2,
-                                            center = Offset(
-                                                centerX + cos(angle) * distance,
-                                                centerY + sin(angle) * distance
-                                            )
-                                        )
-                                    }
+                                    swirl(
+                                        animationProgress,
+                                        baseX,
+                                        centerX,
+                                        baseY,
+                                        centerY,
+                                        pixel,
+                                        dotSizePx
+                                    )
                                 }
 
                                 else -> {
-                                    val dotProgress = (animationProgress.value * randomValue)
-                                        .coerceIn(0f, 1f)
-                                    val alpha = 1f - dotProgress
-
-                                    val offset = when (effect) {
-                                        AnimationEffect.LEFT -> Offset(size.width * dotProgress, 0f)
-                                        AnimationEffect.RIGHT -> Offset(
-                                            -size.width * dotProgress,
-                                            0f
-                                        )
-
-                                        AnimationEffect.UP -> Offset(0f, size.height * dotProgress)
-                                        AnimationEffect.DOWN -> Offset(
-                                            0f,
-                                            -size.height * dotProgress
-                                        )
-
-                                        else -> Offset.Zero
-                                    }
-
-                                    if (alpha > 0) {
-                                        drawCircle(
-                                            color = Color(pixel).copy(alpha = alpha),
-                                            radius = dotSizePx / 2,
-                                            center = Offset(
-                                                baseX + dotSizePx / 2 + offset.x,
-                                                baseY + dotSizePx / 2 + offset.y
-                                            )
-                                        )
-                                    }
+                                    directional(
+                                        animationProgress,
+                                        randomValue,
+                                        effect,
+                                        pixel,
+                                        dotSizePx,
+                                        baseX,
+                                        baseY
+                                    )
                                 }
                             }
                         }
