@@ -22,19 +22,20 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vanishedcomposable.ui.theme.VanishedComposableTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.example.vanishcomposable.controller.AnimationController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,31 +43,27 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VanishedComposableTheme {
-                var vanished = remember { mutableStateOf(false) }
+                val controllers = remember { mutableStateListOf<AnimationController>() }
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.White)
                 ) { innerPadding ->
-                    val imageBitmap = ImageBitmap.imageResource(id = R.drawable.flowers)
-                    /*Box(Modifier.height(200.dp).width(80.dp)) {
-                        DottedImage(
-                            image = imageBitmap,
-                            dotSize = 2f,
-                            modifier = Modifier.padding(innerPadding)
-                        )
-                    }*/
                     Column(Modifier.padding(innerPadding)) {
-                        ComposableAnimation(
-                            Modifier
-                                .height(200.dp)
-                                .fillMaxWidth(),
-                            dotSize = 2f,
-                            vanished = vanished
-                        ) {
-                            ContentComposable(vanished)
+                        repeat(2) {
+                            var controller: AnimationController? by remember { mutableStateOf(null) }
+                            ComposableAnimation(
+                                Modifier
+                                    .height(200.dp)
+                                    .fillMaxWidth(),
+                                dotSize = 2f,
+                                onControllerReady = {
+                                    controller = it
+                                }
+                            ) {
+                                ContentComposable(controller)
+                            }
                         }
-
                     }
                 }
             }
@@ -92,7 +89,7 @@ fun GreetingPreview() {
 }
 
 @Composable
-fun ContentComposable(vanished: MutableState<Boolean>) {
+fun ContentComposable(controller: AnimationController?) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -117,7 +114,9 @@ fun ContentComposable(vanished: MutableState<Boolean>) {
             )
             Spacer(modifier = Modifier.width(16.dp))
             Button(onClick = {
-                vanished.value = true
+                controller?.triggerVanish() {
+
+                }
             }) {
                 Text("Delete", color = Color.White)
             }

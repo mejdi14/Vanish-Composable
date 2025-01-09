@@ -11,6 +11,8 @@ import androidx.compose.ui.platform.LocalDensity
 import android.graphics.Bitmap
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.drawToBitmap
+import com.example.vanishcomposable.controller.AnimationController
+import com.example.vanishcomposable.controller.AnimationStateHolder
 import kotlinx.coroutines.delay
 import kotlin.math.*
 import kotlin.random.Random
@@ -34,21 +36,41 @@ fun ComposableAnimation(
     modifier: Modifier = Modifier,
     dotSize: Float = 6f,
     spacing: Float = 2f,
-    vanished: MutableState<Boolean>,
     effect: AnimationEffect = AnimationEffect.SCATTER,
+    onControllerReady: (AnimationController) -> Unit = {},
     content: @Composable () -> Unit
 ) {
+    val stateHolder = remember { AnimationStateHolder() }
     var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-    var isAnimating by remember { mutableStateOf(false) }
     var composeView by remember { mutableStateOf<ComposeView?>(null) }
+    var onAnimationFinish by remember { mutableStateOf<() -> Unit>({}) }
     val density = LocalDensity.current.density
 
     val randomValues = remember {
         List(1000) { Random.nextFloat() }
     }
+    val controller = remember {
+        object : AnimationController {
+            override fun triggerVanish(onFinish: () -> Unit) {
+                stateHolder.vanished = true
+                onAnimationFinish = onFinish
+            }
+
+            override fun reset() {
+                stateHolder.vanished = false
+                stateHolder.isAnimating = false
+                bitmap = null
+                onAnimationFinish = {}
+            }
+        }
+    }
+
+    LaunchedEffect(controller) {
+        onControllerReady(controller)
+    }
 
     val animationProgress = animateFloatAsState(
-        targetValue = if (isAnimating) 1f else 0f,
+        targetValue = if (stateHolder.isAnimating) 1f else 0f,
         animationSpec = tween(
             durationMillis = when (effect) {
                 AnimationEffect.SHATTER -> 1500
@@ -56,7 +78,12 @@ fun ComposableAnimation(
                 else -> 1200
             },
             easing = FastOutSlowInEasing
-        ), label = ""
+        ),
+        finishedListener = {
+            if (it >= 1f) {
+                onAnimationFinish()
+            }
+        }, label = ""
     )
 
     LaunchedEffect(composeView) {
@@ -74,7 +101,7 @@ fun ComposableAnimation(
     }
 
     Box(modifier = modifier) {
-        if (bitmap == null || !vanished.value) {
+        if (bitmap == null || !stateHolder.vanished) {
             AndroidView(
                 factory = { context ->
                     ComposeView(context).apply {
@@ -94,9 +121,9 @@ fun ComposableAnimation(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable { isAnimating = true }
+                    .clickable { stateHolder.isAnimating = true }
             ) {
-                isAnimating = true
+                stateHolder.isAnimating = true
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val dotSizePx = dotSize * density
                     val spacingPx = spacing * density
