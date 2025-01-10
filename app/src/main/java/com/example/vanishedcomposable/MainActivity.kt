@@ -1,6 +1,5 @@
 package com.example.vanishedcomposable
 
-import VanishComposable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +8,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.example.vanishedcomposable.ui.theme.VanishedComposableTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.vanishcomposable.Animation.AnimationEffect
 import com.example.vanishcomposable.composable.VanishComposable
 import com.example.vanishcomposable.controller.AnimationController
 
@@ -43,13 +44,19 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VanishedComposableTheme {
+                val listItems = listOf<Pair<AnimationEffect, Int>>(
+                    Pair(AnimationEffect.DISSOLVE, R.drawable.flowers),
+                    Pair(AnimationEffect.EXPLODE, R.drawable.cameleon),
+                    Pair(AnimationEffect.LEFT, R.drawable.cheetah),
+                    Pair(AnimationEffect.SCATTER, R.drawable.sea),
+                )
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.White)
                 ) { innerPadding ->
-                    Column(Modifier.padding(innerPadding)) {
-                        repeat(4) { index 
+                    LazyColumn(Modifier.padding(innerPadding)) {
+                        items(listItems) { item ->
                             var controller: AnimationController? by remember { mutableStateOf(null) }
                             VanishComposable(
                                 Modifier
@@ -60,7 +67,7 @@ class MainActivity : ComponentActivity() {
                                     controller = it
                                 }
                             ) {
-                                ContentComposable(controller)
+                                ContentComposable(controller, item)
                             }
                         }
                     }
@@ -88,7 +95,7 @@ fun GreetingPreview() {
 }
 
 @Composable
-fun ContentComposable(controller: AnimationController?) {
+fun ContentComposable(controller: AnimationController?, item: Pair<AnimationEffect, Int>) {
     Box(
         modifier = Modifier
             .fillMaxSize()
