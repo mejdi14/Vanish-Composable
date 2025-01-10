@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
                     mutableStateListOf(
                         VanishItem(1L, AnimationEffect.DISSOLVE, R.drawable.flowers),
                         VanishItem(2L, AnimationEffect.EXPLODE, R.drawable.cameleon),
-                        VanishItem(3L, AnimationEffect.LEFT, R.drawable.cheetah),
+                        VanishItem(3L, AnimationEffect.LEFT_TO_RIGHT, R.drawable.cheetah),
                         VanishItem(4L, AnimationEffect.SCATTER, R.drawable.sea),
                     )
                 }

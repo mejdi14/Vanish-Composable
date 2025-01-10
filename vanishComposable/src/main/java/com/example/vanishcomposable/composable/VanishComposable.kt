@@ -3,7 +3,6 @@ package com.example.vanishcomposable.composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
@@ -13,14 +12,7 @@ import android.graphics.Bitmap
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.drawToBitmap
 import com.example.vanishcomposable.Animation.AnimationEffect
-import com.example.vanishcomposable.Animation.directional
-import com.example.vanishcomposable.Animation.dissolve
-import com.example.vanishcomposable.Animation.explode
-import com.example.vanishcomposable.Animation.pixelate
-import com.example.vanishcomposable.Animation.scatter
-import com.example.vanishcomposable.Animation.shatter
-import com.example.vanishcomposable.Animation.swirl
-import com.example.vanishcomposable.Animation.wave
+import com.example.vanishcomposable.VanishOptions
 import com.example.vanishcomposable.controller.AnimationController
 import com.example.vanishcomposable.controller.AnimationStateHolder
 import kotlinx.coroutines.delay
@@ -30,9 +22,8 @@ import kotlin.random.Random
 @Composable
 fun VanishComposable(
     modifier: Modifier = Modifier,
-    dotSize: Float = 6f,
-    spacing: Float = 2f,
-    effect: AnimationEffect = AnimationEffect.LEFT,
+    vanishOptions: VanishOptions = VanishOptions(),
+    effect: AnimationEffect = AnimationEffect.LEFT_TO_RIGHT,
     onControllerReady: (AnimationController) -> Unit = {},
     content: @Composable () -> Unit
 ) {
@@ -43,7 +34,7 @@ fun VanishComposable(
     val density = LocalDensity.current.density
 
     val randomValues = remember {
-        List(1000) { Random.nextFloat() }
+        List(vanishOptions.pixelVelocity) { Random.nextFloat() }
     }
     val controller = remember {
         object : AnimationController {
@@ -68,15 +59,11 @@ fun VanishComposable(
     val animationProgress = animateFloatAsState(
         targetValue = if (stateHolder.isAnimating) 1f else 0f,
         animationSpec = tween(
-            durationMillis = when (effect) {
-                AnimationEffect.SHATTER -> 1500
-                AnimationEffect.WAVE -> 1800
-                else -> 1200
-            },
+            durationMillis = vanishOptions.animationDuration,
             easing = FastOutSlowInEasing
         ),
         finishedListener = {
-            if (it >= 1f) {
+            if (it >= vanishOptions.triggerFinishAt) {
                 onAnimationFinish()
             }
         }, label = ""
@@ -117,13 +104,12 @@ fun VanishComposable(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable { stateHolder.isAnimating = true }
             ) {
                 stateHolder.isAnimating = true
                 VanishCanvas(
-                    dotSize,
+                    vanishOptions.pixelSize,
                     density,
-                    spacing,
+                    vanishOptions.pixelSpacing,
                     bitmap,
                     randomValues,
                     effect,
