@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,7 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vanishedcomposable.ui.theme.VanishedComposableTheme
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.vanishcomposable.Animation.AnimationEffect
 import com.example.vanishcomposable.composable.VanishComposable
 import com.example.vanishcomposable.controller.AnimationController
@@ -44,30 +47,33 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VanishedComposableTheme {
-                val listItems = listOf<Pair<AnimationEffect, Int>>(
-                    Pair(AnimationEffect.DISSOLVE, R.drawable.flowers),
-                    Pair(AnimationEffect.EXPLODE, R.drawable.cameleon),
-                    Pair(AnimationEffect.LEFT, R.drawable.cheetah),
-                    Pair(AnimationEffect.SCATTER, R.drawable.sea),
-                )
+                val listItems = remember {
+                    mutableStateListOf(
+                        VanishItem(1L, AnimationEffect.DISSOLVE, R.drawable.flowers),
+                        VanishItem(2L, AnimationEffect.EXPLODE, R.drawable.cameleon),
+                        VanishItem(3L, AnimationEffect.LEFT, R.drawable.cheetah),
+                        VanishItem(4L, AnimationEffect.SCATTER, R.drawable.sea),
+                    )
+                }
                 Scaffold(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White)
+                        .fillMaxSize(),
+                    containerColor = Color.Black
                 ) { innerPadding ->
                     LazyColumn(Modifier.padding(innerPadding)) {
-                        items(listItems) { item ->
+                        itemsIndexed(listItems, key = { _, item -> item.id }) { index, item ->
                             var controller: AnimationController? by remember { mutableStateOf(null) }
                             VanishComposable(
                                 Modifier
                                     .height(200.dp)
                                     .fillMaxWidth(),
                                 dotSize = 2f,
+                                effect = item.effect,
                                 onControllerReady = {
                                     controller = it
                                 }
                             ) {
-                                ContentComposable(controller, item)
+                                ContentComposable(controller, item, listItems)
                             }
                         }
                     }
@@ -76,6 +82,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+data class VanishItem(
+    val id: Long,
+    val effect: AnimationEffect,
+    @DrawableRes val drawableRes: Int
+)
 
 
 @Composable
@@ -95,7 +107,11 @@ fun GreetingPreview() {
 }
 
 @Composable
-fun ContentComposable(controller: AnimationController?, item: Pair<AnimationEffect, Int>) {
+fun ContentComposable(
+    controller: AnimationController?,
+    item: VanishItem,
+    listItems: SnapshotStateList<VanishItem>,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -107,7 +123,7 @@ fun ContentComposable(controller: AnimationController?, item: Pair<AnimationEffe
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Image(
-                painter = painterResource(id = R.drawable.flowers),
+                painter = painterResource(id = item.drawableRes),
                 contentDescription = null,
                 modifier = Modifier.size(100.dp)
             )
@@ -121,7 +137,7 @@ fun ContentComposable(controller: AnimationController?, item: Pair<AnimationEffe
             Spacer(modifier = Modifier.width(16.dp))
             Button(onClick = {
                 controller?.triggerVanish() {
-
+                    listItems.remove(item)
                 }
             }) {
                 Text("Delete", color = Color.White)
