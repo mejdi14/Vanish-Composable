@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "VanishedComposable"
 include(":app")
- 
+include(":vanishComposable")
