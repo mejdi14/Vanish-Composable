@@ -7,18 +7,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,6 +41,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import com.example.vanishcomposable.Animation.AnimationEffect
 import com.example.vanishcomposable.composable.VanishComposable
 import com.example.vanishcomposable.controller.AnimationController
@@ -58,7 +64,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize(),
-                    containerColor = Color.Black
+                    containerColor = Color.Transparent
                 ) { innerPadding ->
                     LazyColumn(Modifier.padding(innerPadding)) {
                         itemsIndexed(listItems, key = { _, item -> item.id }) { index, item ->
@@ -66,8 +72,7 @@ class MainActivity : ComponentActivity() {
                             VanishComposable(
                                 Modifier
                                     .height(200.dp)
-                                    .fillMaxWidth(),
-                                dotSize = 2f,
+                                    .padding(horizontal = 20.dp),
                                 effect = item.effect,
                                 onControllerReady = {
                                     controller = it
@@ -75,6 +80,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 ContentComposable(controller, item, listItems)
                             }
+                            Spacer(Modifier.height(10.dp))
                         }
                     }
                 }
@@ -115,33 +121,46 @@ fun ContentComposable(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(Color.Black, shape = RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceAround,
+
         ) {
             Image(
                 painter = painterResource(id = item.drawableRes),
                 contentDescription = null,
-                modifier = Modifier.size(100.dp)
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(150.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 "This is a random text just to make sure that you undersand this!",
                 Modifier.width(100.dp),
-                color = Color.Black,
-                fontSize = 30.sp,
+                color = Color.White,
+                fontSize = 16.sp,
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = {
-                controller?.triggerVanish() {
-                    listItems.remove(item)
-                }
-            }) {
-                Text("Delete", color = Color.White)
-            }
         }
+        Image(
+            painter = painterResource(id = R.drawable.cross),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(50.dp)
+                .clickable{
+                    controller?.triggerVanish() {
+                        listItems.remove(item)
+                    }
+                }
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .clip(RoundedCornerShape(8.dp)),
+
+            )
     }
+
 }
