@@ -12,18 +12,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,9 +52,10 @@ class MainActivity : ComponentActivity() {
                 val listItems = remember {
                     mutableStateListOf(
                         VanishItem(1L, AnimationEffect.DISSOLVE, R.drawable.flowers),
-                        VanishItem(2L, AnimationEffect.EXPLODE, R.drawable.cameleon),
-                        VanishItem(3L, AnimationEffect.LEFT_TO_RIGHT, R.drawable.cheetah),
+                        VanishItem(2L, AnimationEffect.SWIRL, R.drawable.cameleon),
                         VanishItem(4L, AnimationEffect.SCATTER, R.drawable.sea),
+                        VanishItem(3L, AnimationEffect.LEFT_TO_RIGHT, R.drawable.cheetah),
+                        VanishItem(5L, AnimationEffect.DISSOLVE, R.drawable.flowers),
                     )
                 }
                 Scaffold(
@@ -139,10 +136,10 @@ fun ContentComposable(
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
-                "This is a random text just to make sure that you undersand this!",
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
                 Modifier.width(100.dp),
                 color = Color.White,
-                fontSize = 16.sp,
+                fontSize = 12.sp,
             )
             Spacer(modifier = Modifier.width(16.dp))
         }
@@ -150,7 +147,7 @@ fun ContentComposable(
             painter = painterResource(id = R.drawable.cross),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(50.dp)
+            modifier = Modifier.size(35.dp)
                 .clickable{
                     controller?.triggerVanish() {
                         listItems.remove(item)
