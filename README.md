@@ -23,7 +23,7 @@
 
 ## :art:Design inspiration
 
-many thanks goes to [Kim Baschet](https://twitter.com/Kim_____B) for the beautiful design and
+many thanks goes to [A. Hassan](https://x.com/azhassan_) for the beautiful design and
 animation
 
 ## Installation
