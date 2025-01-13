@@ -18,7 +18,7 @@
 ## ✨ Demo
 
 <p align="center">
-<img src="https://github.com/mejdi14/Vanish-Composable/tree/main/demo/vanish_demo.gif" height="800" width="550" >
+<img src="https://github.com/mejdi14/Vanish-Composable/tree/main/demo/output.gif" height="500" width="550" >
 	</p>
 
 ## :art:Design inspiration
