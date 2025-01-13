@@ -18,7 +18,7 @@
 ## ✨ Demo
 
 <p align="center">
-<img src="https://github.com/mejdi14/Card-Switcher/blob/main/app/images/demo.gif" height="400" width="550" >
+<img src="https://github.com/mejdi14/Vanish-Composable/tree/main/demo/vanish_demo.gif" height="400" width="550" >
 	</p>
 
 ## :art:Design inspiration
