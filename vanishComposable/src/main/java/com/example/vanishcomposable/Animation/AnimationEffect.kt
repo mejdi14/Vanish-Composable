@@ -11,5 +11,6 @@ enum class AnimationEffect {
     UP,
     DOWN,
     DISSOLVE,
-    EXPLODE
+    EXPLODE,
+    MOSAIC,
 }
