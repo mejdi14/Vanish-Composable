@@ -1,6 +1,5 @@
 package com.example.vanishcomposable.Animation
 
-import android.R.attr.scaleY
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.runtime.State
 import androidx.compose.ui.geometry.Offset
@@ -9,7 +8,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import kotlin.math.sqrt
-import kotlin.random.Random
 
 
 fun DrawScope.mosaic(
