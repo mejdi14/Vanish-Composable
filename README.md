@@ -17,20 +17,20 @@
 
 ## ✨ Demo
 
-<p align="center">
+<div style="display: flex; justify-content: center; align-items: center;">
   <img 
     src="https://raw.githubusercontent.com/mejdi14/Vanish-Composable/main/demo/output.gif"
-    height="600"
-    width="550"
-    style="margin-right: 20px;" 
+    height="300"
+    width="275"
+    style="margin-right: 20px;"
   />
-
   <img 
     src="https://raw.githubusercontent.com/mejdi14/Vanish-Composable/main/demo/second_output.gif"
-    height="600"
-    width="550"
+    height="300"
+    width="275"
   />
-</p>
+</div>
+
 
 
 
