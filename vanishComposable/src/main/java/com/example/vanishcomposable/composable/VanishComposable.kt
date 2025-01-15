@@ -1,14 +1,15 @@
 package com.example.vanishcomposable.composable
 
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
-import android.graphics.Bitmap
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.drawToBitmap
 import com.example.vanishcomposable.Animation.AnimationEffect
@@ -19,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun VanishComposable(
     modifier: Modifier = Modifier,
@@ -101,10 +103,11 @@ fun VanishComposable(
                 }
             )
         } else {
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
+
                 stateHolder.isAnimating = true
                 VanishCanvas(
                     vanishOptions.pixelSize,
@@ -113,7 +116,9 @@ fun VanishComposable(
                     bitmap,
                     randomValues,
                     effect,
-                    animationProgress
+                    animationProgress,
+                    boxWidth = maxWidth,
+                    boxHeight = maxHeight
                 )
             }
         }

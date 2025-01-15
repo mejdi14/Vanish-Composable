@@ -1,8 +1,5 @@
 package com.example.vanishcomposable
 
-import androidx.annotation.DrawableRes
-import com.example.vanishcomposable.Animation.AnimationEffect
-
 data class VanishOptions(
     val pixelSize: Float = 4f,
     val pixelSpacing: Float = 2f,
