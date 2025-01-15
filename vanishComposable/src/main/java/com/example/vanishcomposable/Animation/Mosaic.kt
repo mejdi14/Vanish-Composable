@@ -11,14 +11,6 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-private val randomShiftsCache = mutableMapOf<Pair<Int, Int>, Float>()
-
-private fun randomShiftFor(row: Int, col: Int): Float {
-    return randomShiftsCache.getOrPut(row to col) {
-        // Generate a random value between -20..+20
-        Random.nextFloat() * 100f - 20f
-    }
-}
 
 fun DrawScope.mosaic(
     animationProgress: State<Float>,
@@ -39,7 +31,13 @@ fun DrawScope.mosaic(
         .coerceIn(0f, 1f)
     val easedProgress = FastOutSlowInEasing.transform(rawProgress)
 
-    val alpha = (1 - easedProgress).coerceIn(0f, 1f)
+    val fadeStart = 0.8f
+    val alpha = if (easedProgress < fadeStart) {
+        1f
+    } else {
+        val fractionIntoFade = (easedProgress - fadeStart) / (1f - fadeStart)
+        1f - fractionIntoFade
+    }
 
     if (easedProgress <= 0f) {
         drawRect(
@@ -49,10 +47,6 @@ fun DrawScope.mosaic(
         )
         return
     }
-    val randomAngles =
-        Array(cols * rows) { Random.nextFloat() * 360f }
-
-
     val canvasCenterX = cols * squareSize / 2
     val canvasCenterY = rows * squareSize / 2
     val pixelCenterX = baseX + squareSize / 2
@@ -65,28 +59,24 @@ fun DrawScope.mosaic(
     val normalizedY = if (length != 0f) vectorY / length else 0f
 
     val explosionDistance = 580f * easedProgress
-    val moveX = normalizedX * explosionDistance + Random.nextFloat()
+    val moveX = normalizedX * explosionDistance
     val moveY = normalizedY * explosionDistance
-
-    val randomAngleForThisPixel = randomAngles[row * cols + col] // for example
 
     val index = row * cols + col
     val rotationDegree = tiltDegrees[index]
-
-
-
+    val scaleNow = randomScales[index]
 
     withTransform({
         rotate(
-            degrees = rotationDegree ,
+            degrees = rotationDegree,
             pivot = Offset(
                 (baseX + moveX) + (squareSize / 2),
                 (baseY + moveY) + (squareSize / 2)
             )
         )
         scale(
-            scaleX = randomScales[index],
-            scaleY = randomScales[index],
+            scaleX = scaleNow,
+            scaleY = scaleNow
         )
     }) {
         drawRect(

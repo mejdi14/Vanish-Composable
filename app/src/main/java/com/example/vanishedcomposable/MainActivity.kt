@@ -130,7 +130,7 @@ fun ContentComposable(
 @Composable
 fun ImageContent(controller: AnimationController?) {
     Image(
-        painterResource(R.drawable.messi),
+        painterResource(R.drawable.demarco),
         contentScale = ContentScale.Crop,
         contentDescription = "",
         modifier = Modifier.fillMaxSize()
