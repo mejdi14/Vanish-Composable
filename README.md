@@ -19,11 +19,19 @@
 
 <p align="center">
   <img 
-    src="https://raw.githubusercontent.com/mejdi14/Vanish-Composable/main/demo/output.gif" 
-    height="600" 
+    src="https://raw.githubusercontent.com/mejdi14/Vanish-Composable/main/demo/output.gif"
+    height="600"
+    width="550"
+    style="margin-right: 20px;" 
+  />
+
+  <img 
+    src="https://raw.githubusercontent.com/mejdi14/Vanish-Composable/main/demo/second_output.gif"
+    height="600"
     width="550"
   />
 </p>
+
 
 
 ## :art:Design inspiration
