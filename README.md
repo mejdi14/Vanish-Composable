@@ -47,7 +47,7 @@ above):
 ```gradle
 dependencies {
 	...
-	implementation("io.github.mejdi14:vanish_composable:0.0.1")
+	implementation("io.github.mejdi14:vanish_composable:0.0.2")
 }
 ```
 
