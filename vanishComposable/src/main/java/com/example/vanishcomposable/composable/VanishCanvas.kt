@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -11,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import com.example.vanishcomposable.Animation.AnimationEffect
 import com.example.vanishcomposable.Animation.directional
 import com.example.vanishcomposable.Animation.dissolve
@@ -22,6 +25,7 @@ import com.example.vanishcomposable.Animation.shatter
 import com.example.vanishcomposable.Animation.swirl
 import com.example.vanishcomposable.Animation.wave
 import com.example.vanishcomposable.helper.getDominantColor
+import kotlin.random.Random
 
 @Composable
 internal fun VanishCanvas(
@@ -32,14 +36,34 @@ internal fun VanishCanvas(
     randomValues: List<Float>,
     effect: AnimationEffect,
     animationProgress: State<Float>,
-    isSquarePixel: Boolean = false // New parameter to control pixel shape
+    boxWidth: Dp,
+    boxHeight: Dp,
+    isSquarePixel: Boolean = false, // New parameter to control pixel shape
 ) {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val pixelSizePx = pixelSize * density
-        val spacingPx = spacing * density
+    val pixelSizePx = pixelSize * density
+    val spacingPx = spacing * density
 
-        val cols = (size.width / (pixelSizePx + spacingPx)).toInt()
-        val rows = (size.height / (pixelSizePx + spacingPx)).toInt()
+    val pxWidth = with(LocalDensity.current) { boxWidth.toPx() }
+    val pxHeight = with(LocalDensity.current) { boxHeight.toPx() }
+
+    val cols = (pxWidth / (pixelSizePx + spacingPx)).toInt()
+    val rows = (pxHeight / (pixelSizePx + spacingPx)).toInt()
+    val randomRotation = remember {
+        List(cols * rows) { Random.nextFloat() * 15f}
+    }
+    val randomShiftsCache = remember {
+        Array(rows * cols) { Random.nextFloat() * 40f - 20f }
+    }
+    val randomScales = remember {
+        List(cols * rows) {
+            // scale range: [0.8 .. 1.2]
+            0.8f + Random.nextFloat() * 0.4f
+        }
+    }
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+
+
 
         val bmp = bitmap!!
         val scaleX = bmp.width.toFloat() / cols
@@ -151,6 +175,7 @@ internal fun VanishCanvas(
                     }
 
                     AnimationEffect.MOSAIC -> {
+
                         mosaic(
                             animationProgress,
                             col,
@@ -160,7 +185,10 @@ internal fun VanishCanvas(
                             baseX,
                             baseY,
                             cols,
-                            rows
+                            rows,
+                            randomRotation,
+                            randomShiftsCache,
+                            randomScales
                         )
                     }
 
